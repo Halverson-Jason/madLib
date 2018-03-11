@@ -32,7 +32,7 @@ void getFileName(char fileName[]);
 bool isFileName(char fileName[]);
 bool playAgain();
 void askQuestions(char word[], int count);
-void displayStory(char story[][MAX_WORD_LENGTH], int *storyLineLength);
+void displayStory(char story[][MAX_WORD_LENGTH], int count);
 void isSpecial(char character[]);
 
 /**********************************************************************
@@ -51,7 +51,7 @@ int main()
       //call readFile and store wordCount
       wordCount = readFile(story, fileName);
 
-      
+      displayStory(story, wordCount);
       
    } while(playAgain());
    
@@ -124,19 +124,19 @@ void getFileName(char fileName[])
  ***********************************************************************/
 bool isFileName(char fileName[])
 {
-      // Remove due to testBed
+      // Removed due to testBed
 
-   char *pEnd = fileName + FILENAME_LENGTH;
-   for (char * p = fileName; p < pEnd; p++)
-   {
-      if (*p == '.')
-      {
-         return true;
-      }
-   }
-   return false;
+   // char *pEnd = fileName + FILENAME_LENGTH;
+   // for (char * p = fileName; p < pEnd; p++)
+   // {
+   //    if (*p == '.')
+   //    {
+   //       return true;
+   //    }
+   // }
+   // return false;
 
-
+      return true;
 }
 
 /**********************************************************************
@@ -191,6 +191,7 @@ void askQuestions(char word[], int count)
    else if(count > 0)
       cin.getline(word,256);
    
+   cout << endl;
    return;
 }
 
@@ -198,9 +199,22 @@ void askQuestions(char word[], int count)
  * displays story in desired format
  * length is passed to control output
  ***********************************************************************/
-void displayStory(char story[][MAX_WORD_LENGTH], int length)
+void displayStory(char story[][MAX_WORD_LENGTH], int count)
 {
-
+   for (int i = 0; i < count; i++)
+   {
+         if (i == 0)
+         {
+            cout << story[i];
+         }    
+         else if ((story[i][0] == '.') || (story[i][0] == ','))
+         {
+            cout << story[i];
+         }
+            
+         else
+            cout << " " << story[i];
+   }
 }
 
 /**********************************************************************
