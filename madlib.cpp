@@ -1,20 +1,18 @@
 /***********************************************************************
 * Program:
-*    Project 07, Calendar
+*    Project 09, MAD LIB PROGRAM
 *    Brother Ridges, CS124
 * Author:
 *    Jason Halverson
 * Summary: 
-*    Create a calendar for any month of any year from 1753 forward. 
-*    This is similar to the cal utility on the Linux system. Prompt 
-*    the user for the numeric month and year to be displayed as shown 
-*    in the example below. Your calculations to determine the first day 
-*    of the month shall start with January 1, 1753 as a Monday. This 
-*    will also include leap years.
+*    The program will prompt the user for the file that describes the 
+*    Mad Lib®, and then prompt him for all the substitute words. When 
+*    all the prompts are complete, the program will display the 
+*    completed story on the screen.
 *
 *    Estimated:  2.0 hrs   
 *    Actual:     3.0 hrs
-*      writing the display function , along with setting up the offset
+*      figuring out how to read / parse file
 ************************************************************************/
 
 #include <iostream>
@@ -29,15 +27,13 @@ using namespace std;
 #define MAX_WORD_LENGTH 32
 #define MAX_CHAR_LENGTH 80
 
-//write the code necessary read the Mad Lib from a file and prompt the user:
-
 int readFile(char story[][MAX_WORD_LENGTH], char fileName[]);
 void getFileName(char fileName[]);
 bool isFileName(char fileName[]);
 bool playAgain();
 void askQuestions(char word[], int count);
 void displayStory(char story[][MAX_WORD_LENGTH], int *storyLineLength);
-bool isPunc(char character[]);
+void isSpecial(char character[]);
 
 /**********************************************************************
  * Calls readFile , getFilename, askQuestions, displayStory
@@ -45,24 +41,27 @@ bool isPunc(char character[]);
  ***********************************************************************/
 int main()
 {
+   //Setup variables
    char fileName[FILENAME_LENGTH];
    char story[MAX_LINES][MAX_WORD_LENGTH];
    int wordCount = 0;
-   
-   
+
+   //call readFile and store wordCount
    wordCount = readFile(story, fileName);
 
-
+   cout << "Thank you for playing.\n";
    return 0;
 }
 
 /**********************************************************************
  * Read file into story array
- * returns nothing as it uses pointers
+ * returns wordcount
  ***********************************************************************/
 int readFile(char story[][MAX_WORD_LENGTH], char fileName[])
 {
+   //get the filename and varify
    getFileName(fileName);
+
    // open the file for reading changed string to c_string
    ifstream fin(fileName);
 
@@ -75,20 +74,22 @@ int readFile(char story[][MAX_WORD_LENGTH], char fileName[])
          << endl;
       return false;
    }
+
    // read data from file and update word count
 
    int wordCount = 0;
-   int count = 0;
-   //TODO: change this to for loop
-   while (fin >> story[wordCount])
+   
+   // loop through everyword and update wordcount
+   for (int count = 0;fin >> story[wordCount];)
    {
+      //check if special char
       if (story[wordCount][0] == '<' && isalpha(story[wordCount][1]))
       {
          askQuestions(story[wordCount], count);
          count++;
       }
       else if (story[wordCount][0] == '<' && !isalpha(story[wordCount][2]))
-         isPunc(story[wordCount]);
+         isSpecial(story[wordCount]);
       wordCount++;
 
    }
@@ -118,15 +119,18 @@ void getFileName(char fileName[])
  ***********************************************************************/
 bool isFileName(char fileName[])
 {
-   char *pEnd = fileName + FILENAME_LENGTH;
-   for (char * p = fileName; p < pEnd; p++)
-   {
-      if (*p == '.')
-      {
-         return true;
-      }
-   }
-   return false;
+      // Removed due to testBed
+
+//    char *pEnd = fileName + FILENAME_LENGTH;
+//    for (char * p = fileName; p < pEnd; p++)
+//    {
+//       if (*p == '.')
+//       {
+//          return true;
+//       }
+//    }
+//    return false;
+      return true;
 
 }
 
@@ -140,12 +144,15 @@ bool playAgain()
 }
 
 /**********************************************************************
- * 
+ * prompts the user for the question in the madlib
+ * returns nothing
  ***********************************************************************/
 void askQuestions(char word[], int count)
 {
+   // changes first letter to capitalized
    cout << "\t" << (char)toupper(word[1]);
 
+   // walks though till end of special '>'
    for (int i = 2; word[i] != '>'; i++)
    {
       if (word[i] == '_')
@@ -158,6 +165,7 @@ void askQuestions(char word[], int count)
 
    cout << ": ";                                    
 
+   // gets input to question
    if (count == 0)
    {
       cin.ignore();
@@ -179,11 +187,12 @@ void displayStory(char story[][MAX_WORD_LENGTH], int length)
 }
 
 /**********************************************************************
- * Sentence-case the text, meaning capitalize the first letter and 
- * convert the rest to lowercase.
+ * Check what special character proceeding '<'
+ * returns nothing
  ***********************************************************************/
-bool isPunc(char character[])
+void isSpecial(char character[])
 {
+      //check what special character
 switch (character[1])
 {
          case '#':
@@ -194,18 +203,22 @@ switch (character[1])
             character[0] = ' ';
             character[1] = '\"';
             character[2] = '\0';
+            break;
          case '}':
             character[0] = '\"';
             character[1] = ' ';
             character[2] = '\0';
+            break;
          case '[':
             character[0] = ' ';
             character[1] = '\'';
             character[2] = '\0';
+            break;
          case ']':
             character[0] = '\'';
             character[1] = ' ';
             character[2] = '\0';
+            break;
       }
 }
    
