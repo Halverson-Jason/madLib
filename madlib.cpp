@@ -46,10 +46,15 @@ int main()
    char story[MAX_LINES][MAX_WORD_LENGTH];
    int wordCount = 0;
 
-   //call readFile and store wordCount
-   wordCount = readFile(story, fileName);
+   do
+   {
+      //call readFile and store wordCount
+      wordCount = readFile(story, fileName);
 
-   cout << "Thank you for playing.\n";
+      
+      
+   } while(playAgain());
+   
    return 0;
 }
 
@@ -119,18 +124,18 @@ void getFileName(char fileName[])
  ***********************************************************************/
 bool isFileName(char fileName[])
 {
-      // Removed due to testBed
+      // Remove due to testBed
 
-//    char *pEnd = fileName + FILENAME_LENGTH;
-//    for (char * p = fileName; p < pEnd; p++)
-//    {
-//       if (*p == '.')
-//       {
-//          return true;
-//       }
-//    }
-//    return false;
-      return true;
+   char *pEnd = fileName + FILENAME_LENGTH;
+   for (char * p = fileName; p < pEnd; p++)
+   {
+      if (*p == '.')
+      {
+         return true;
+      }
+   }
+   return false;
+
 
 }
 
@@ -140,7 +145,19 @@ bool isFileName(char fileName[])
  ***********************************************************************/
 bool playAgain()
 {
+   char response;
+   cout << "Do you want to play again (y/n)? ";
+   cin >> response;
 
+   if(response == 'y')
+   {
+      return true;
+   }
+
+   else if(response == 'n')
+   {
+      cout << "Thank you for playing.\n";
+   }
 }
 
 /**********************************************************************
