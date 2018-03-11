@@ -1,6 +1,6 @@
 /***********************************************************************
 * Program:
-*    Project 09, MAD LIB PROGRAM
+*    Project 10, MAD LIB
 *    Brother Ridges, CS124
 * Author:
 *    Jason Halverson
@@ -11,8 +11,8 @@
 *    completed story on the screen.
 *
 *    Estimated:  2.0 hrs   
-*    Actual:     3.0 hrs
-*      figuring out how to read / parse file
+*    Actual:     1.0 hrs
+*      writing all the if / switch statements
 ************************************************************************/
 
 #include <iostream>
@@ -33,11 +33,10 @@ bool isFileName(char fileName[]);
 bool playAgain();
 void askQuestions(char word[], int count);
 void displayStory(char story[][MAX_WORD_LENGTH], int count);
-void isSpecial(char character[]);
 
 /**********************************************************************
- * Calls readFile , getFilename, askQuestions, displayStory
- * isPunc, playAgain (if true start while loop again)
+ * do while loop until user returns playAgain() = false
+ * calls readFile , then displays story
  ***********************************************************************/
 int main()
 {
@@ -51,9 +50,10 @@ int main()
       //call readFile and store wordCount
       wordCount = readFile(story, fileName);
 
+      //display story out
       displayStory(story, wordCount);
       
-   } while(playAgain());
+   } while (playAgain());
    
    return 0;
 }
@@ -64,7 +64,7 @@ int main()
  ***********************************************************************/
 int readFile(char story[][MAX_WORD_LENGTH], char fileName[])
 {
-   //get the filename and varify
+   //get the filename and verify
    getFileName(fileName);
 
    // open the file for reading changed string to c_string
@@ -83,9 +83,9 @@ int readFile(char story[][MAX_WORD_LENGTH], char fileName[])
    // read data from file and update word count
 
    int wordCount = 0;
-   
-   // loop through everyword and update wordcount
-   for (int count = 0;fin >> story[wordCount];)
+   int count = 0;
+   // loop through every word and update word count
+   while (fin >> story[wordCount])
    {
       //check if special char
       if (story[wordCount][0] == '<' && isalpha(story[wordCount][1]))
@@ -93,8 +93,7 @@ int readFile(char story[][MAX_WORD_LENGTH], char fileName[])
          askQuestions(story[wordCount], count);
          count++;
       }
-      else if (story[wordCount][0] == '<' && !isalpha(story[wordCount][2]))
-         isSpecial(story[wordCount]);
+
       wordCount++;
 
    }
@@ -105,38 +104,15 @@ int readFile(char story[][MAX_WORD_LENGTH], char fileName[])
 }
 
 /**********************************************************************
- * gets filename for story as stores in fileName pointer
- * verifies is a file with isFileName
+ * gets filename for story and stores in fileName pointer
  ***********************************************************************/
 void getFileName(char fileName[])
 {
-   do
-   {
-      cout << "Please enter the filename of the Mad Lib: ";
-      cin >> fileName;
-   } while (!isFileName(fileName));
+
+   cout << "Please enter the filename of the Mad Lib: ";
+   cin >> fileName;
    
    return;
-}
-
-/**********************************************************************
- * varifies a file name has a "."
- ***********************************************************************/
-bool isFileName(char fileName[])
-{
-      // Removed due to testBed
-
-   // char *pEnd = fileName + FILENAME_LENGTH;
-   // for (char * p = fileName; p < pEnd; p++)
-   // {
-   //    if (*p == '.')
-   //    {
-   //       return true;
-   //    }
-   // }
-   // return false;
-
-      return true;
 }
 
 /**********************************************************************
@@ -149,12 +125,12 @@ bool playAgain()
    cout << "Do you want to play again (y/n)? ";
    cin >> response;
 
-   if(response == 'y')
+   if (response == 'y')
    {
       return true;
    }
 
-   else if(response == 'n')
+   else if (response == 'n')
    {
       cout << "Thank you for playing.\n";
    }
@@ -172,6 +148,7 @@ void askQuestions(char word[], int count)
    // walks though till end of special '>'
    for (int i = 2; word[i] != '>'; i++)
    {
+      // convert '_' to space
       if (word[i] == '_')
          cout << " ";
       else
@@ -188,10 +165,8 @@ void askQuestions(char word[], int count)
       cin.ignore();
       cin.getline(word,256);
    }
-   else if(count > 0)
+   else if (count > 0)
       cin.getline(word,256);
-   
-   cout << endl;
    return;
 }
 
@@ -201,55 +176,94 @@ void askQuestions(char word[], int count)
  ***********************************************************************/
 void displayStory(char story[][MAX_WORD_LENGTH], int count)
 {
+   // these vars to check if letters are after quotes or newline
+   bool isQuotation = false;
+   bool newLine = true;
+   cout << endl;
+
+   // loop through every letter in story and apply spacing
    for (int i = 0; i < count; i++)
    {
-         if (i == 0)
+      // if it is not an alpha it must be a special char
+      if (story[i][0] == '<' && !isalpha(story[i][2]))
+      {
+         switch (story[i][1])
          {
-            cout << story[i];
-         }    
-         else if ((story[i][0] == '.') || (story[i][0] == ','))
-         {
-            cout << story[i];
+            case '#':
+               cout << endl;
+               newLine = true;
+               break;
+            case '{':
+               if (newLine)
+               {
+                  cout << "\"";
+                  newLine = false;
+               }
+               else
+               {
+                  cout << " \"";
+               }
+               isQuotation = true;
+               break;
+            case '}':
+               cout << "\"";
+               break;
+            case '[':
+               if (newLine)
+               {
+                  cout << "\'";
+                  newLine = false;
+               }
+               else
+               {
+                  cout << " \'";
+               }
+               isQuotation = true;
+               break;
+            case ']':
+               cout << "\'";
+               break;
          }
-            
-         else
-            cout << " " << story[i];
-   }
-}
-
-/**********************************************************************
- * Check what special character proceeding '<'
- * returns nothing
- ***********************************************************************/
-void isSpecial(char character[])
-{
-      //check what special character
-switch (character[1])
-{
-         case '#':
-            character[0] = '\n';
-            character[1] = '\0';
-            break;
-         case '{':
-            character[0] = ' ';
-            character[1] = '\"';
-            character[2] = '\0';
-            break;
-         case '}':
-            character[0] = '\"';
-            character[1] = ' ';
-            character[2] = '\0';
-            break;
-         case '[':
-            character[0] = ' ';
-            character[1] = '\'';
-            character[2] = '\0';
-            break;
-         case ']':
-            character[0] = '\'';
-            character[1] = ' ';
-            character[2] = '\0';
-            break;
       }
+
+      else
+      {
+         switch (story[i][0])
+         {
+            case '.':
+               cout << story[i];
+               break;
+            case ',':
+               cout << story[i];
+               break;
+            case '!':
+               cout << story[i];
+               break;
+            case '?':
+               cout << story[i];
+               break;
+            case ' ':
+               break;
+            default:
+               if (newLine)
+               {
+                  cout << story[i];
+                  newLine = false;
+               }
+               else if (isQuotation)
+               {
+                  cout << story[i];
+                  isQuotation = false;
+               }
+               else
+               {
+                  cout << " " << story[i];
+               }
+               
+         }
+      }
+            
+   }
+
+   cout << endl;
 }
-   
